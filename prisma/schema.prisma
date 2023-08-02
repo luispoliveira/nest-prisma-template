@@ -1,0 +1,141 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator nestgraphql {
+  provider               = "node node_modules/prisma-nestjs-graphql"
+  output                 = "./__generated__/prisma-nestjs-graphql"
+  fields_Validator_from  = "class-validator"
+  fields_Validator_input = true
+  reExport               = All
+  purgeOutput            = true
+  emitSingle             = true
+}
+
+generator prismaClassGenerator {
+  provider = "prisma-class-generator"
+  dryRun   = false
+  output   = "./__generated__/prisma-class-generator"
+}
+
+model User {
+  id                   Int                 @id @default(autoincrement())
+  username             String              @unique
+  email                String              @unique
+  password             String
+  isActive             Boolean             @default(false)
+  resetPasswordToken   String?             @unique
+  resetPasswordExpires DateTime?
+
+  roles                Roles2Users[]
+  permissions          Permissions2Users[]
+
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
+  createdBy            String?
+  updatedBy            String?
+
+  @@map("user")
+}
+
+model Role {
+  id          Int                 @id @default(autoincrement())
+  name        String              @unique
+
+  users       Roles2Users[]
+  permissions Permissions2Roles[]
+
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  createdBy   String?
+  updatedBy   String?
+
+  @@map("role")
+}
+
+model Permission {
+  id        Int                 @id @default(autoincrement())
+  name      String              @unique
+
+  users     Permissions2Users[]
+  roles     Permissions2Roles[]
+
+  createdAt DateTime            @default(now())
+  updatedAt DateTime            @updatedAt
+  createdBy String?
+  updatedBy String?
+
+  @@map("permission")
+}
+
+model Roles2Users {
+  id        Int      @id @default(autoincrement())
+  role      Role     @relation(fields: [roleId], references: [id])
+  roleId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdBy String?
+  updatedBy String?
+
+  @@map("role_2_user")
+}
+
+model Permissions2Users {
+  id           Int        @id @default(autoincrement())
+  permission   Permission @relation(fields: [permissionId], references: [id])
+  permissionId Int
+  user         User       @relation(fields: [userId], references: [id])
+  userId       Int
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  createdBy    String?
+  updatedBy    String?
+
+  @@map("permission_2_user")
+}
+
+model Permissions2Roles {
+  id          Int        @id @default(autoincrement())
+  permission   Permission @relation(fields: [permissionId], references: [id])
+  permissionId Int
+  role         Role       @relation(fields: [roleId], references: [id])
+  roleId       Int
+
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  createdBy    String?
+  updatedBy    String?
+
+  @@map("permission_2_role")
+}
+
+
+
+model Log {
+  id        Int      @id @default(autoincrement())
+  userAgent String?
+  ip String?
+  method String?
+  url String?
+  body Json?
+  query Json?
+  params Json?
+  className String?
+  methodName String?
+  username String?
+  response Json?
+  createdAt DateTime @default(now())
+
+  @@map("log")
+}
