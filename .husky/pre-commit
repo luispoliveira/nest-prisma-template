@@ -1,0 +1,6 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+yarn git-patch
+git add package.json
+npx lint-staged -c .lintstagedrc.js
