@@ -4,6 +4,7 @@ import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import { PrismaModel } from './shared/__generated__/prisma-class-generator';
 import { EnvironmentEnum } from './shared/enums/environment.enum';
 import { LoggerUtil } from './shared/utils/logger.util';
 
@@ -26,7 +27,9 @@ async function bootstrap() {
     .addBearerAuth()
     .build();
 
-  const swaggerDocument = SwaggerModule.createDocument(app, swaggerConfig);
+  const swaggerDocument = SwaggerModule.createDocument(app, swaggerConfig, {
+    // extraModels: [...PrismaModel.extraModels],
+  });
 
   SwaggerModule.setup(`${globalPrefix}/api-docs`, app, swaggerDocument);
 
