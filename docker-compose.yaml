@@ -1,0 +1,14 @@
+version: '3.4'
+
+services:
+  nestjs_postgres:
+    container_name: nestjs_postgres
+    image: postgres:15.1
+    ports:
+      - "5432:5432"
+    env_file:
+      - ./docker/postgres.env
+    volumes:
+      - ${DOCKER_POSTGRES_PATH}:/var/lib/postgresql/data
+
+#HOW TO RUN: docker-compose up --build -d
