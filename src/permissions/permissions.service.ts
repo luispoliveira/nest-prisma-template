@@ -9,8 +9,12 @@ export class PermissionsService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async findMany(args: Prisma.PermissionFindManyArgs) {
-    return this.prismaService.permission.findMany({
+    return await this.prismaService.permission.findMany({
       ...args,
     });
+  }
+
+  async findUnique(args: Prisma.PermissionFindUniqueArgs) {
+    return await this.prismaService.permission.findUnique(args);
   }
 }

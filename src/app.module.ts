@@ -18,6 +18,7 @@ import { EnvironmentEnum } from './shared/enums/environment.enum';
 import { UsersModule } from './users/users.module';
 import { PermissionsModule } from './permissions/permissions.module';
 import { RolesModule } from './roles/roles.module';
+import { CommandModule } from 'nestjs-command';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -41,6 +42,7 @@ import { RolesModule } from './roles/roles.module';
       autoSchemaFile: true,
       sortSchema: true,
     }),
+    CommandModule,
     LoggerModule,
     PrismaModule,
     AuthModule,
