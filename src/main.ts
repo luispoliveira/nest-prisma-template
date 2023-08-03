@@ -4,7 +4,6 @@ import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
-import { PrismaModel } from './shared/__generated__/prisma-class-generator';
 import { EnvironmentEnum } from './shared/enums/environment.enum';
 import { LoggerUtil } from './shared/utils/logger.util';
 
@@ -37,10 +36,11 @@ async function bootstrap() {
 
   app.setGlobalPrefix(globalPrefix);
 
-  await app.listen(port, () => {
+  await app.listen(port, async () => {
     Logger.log(`Server running on http://localhost:${port}/${globalPrefix}`);
     Logger.log(`GraphQL at http://localhost:${port}/graphql`);
     Logger.log(`Environment: ${environment}`);
+    Logger.log(`Running on: ${await app.getUrl()}`);
   });
 }
 bootstrap();

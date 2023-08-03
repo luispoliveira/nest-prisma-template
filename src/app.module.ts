@@ -19,6 +19,7 @@ import { UsersModule } from './users/users.module';
 import { PermissionsModule } from './permissions/permissions.module';
 import { RolesModule } from './roles/roles.module';
 import { CommandModule } from 'nestjs-command';
+import { ApiKeysModule } from './api-keys/api-keys.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -49,6 +50,7 @@ import { CommandModule } from 'nestjs-command';
     UsersModule,
     PermissionsModule,
     RolesModule,
+    ApiKeysModule,
   ],
   controllers: [AppController],
   providers: [AppService, AppResolver],

@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { PermissionsService } from './permissions.service';
 import { PermissionsResolver } from './permissions.resolver';
+import { PermissionsService } from './permissions.service';
 
 @Module({
   providers: [PermissionsService, PermissionsResolver],
