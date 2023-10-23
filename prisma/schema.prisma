@@ -20,105 +20,166 @@ generator nestgraphql {
   emitSingle             = true
 }
 
-generator prismaClassGenerator {
-  provider = "prisma-class-generator"
-  dryRun   = false
-  output   = "../src/shared/__generated__/prisma-class-generator"
+generator erd {
+  provider = "prisma-erd-generator"
+  output   = "../src/shared/__generated__/ERD.svg"
+  theme    = "forest"
 }
 
 model User {
-  id                   Int       @id @default(autoincrement())
-  username             String    @unique
-  email                String    @unique
-  password             String
-  isActive             Boolean   @default(false)
-  resetPasswordToken   String?   @unique
-  resetPasswordExpires DateTime?
-  lastLogin            DateTime?
+  id                     Int       @id @default(autoincrement())
+  email                  String    @unique
+  /// @HideField({input:false, output: true})
+  password               String?
+  /// @HideField({input:true, output: false})
+  isActive               Boolean   @default(false)
+  /// @HideField({input:true, output: true})
+  activationToken        String?   @unique
+  /// @HideField({input:true, output: true})
+  activationTokenExpires DateTime?
+  /// @HideField({input:true, output: true})
+  resetPasswordToken     String?   @unique
+  /// @HideField({input:true, output: true})
+  resetPasswordExpires   DateTime?
+  /// @HideField({input:true, output: false})
+  lastLogin              DateTime?
 
-  user2role       Roles2Users[]
-  user2permission Permissions2Users[]
+  /// @HideField({input:true, output: false})
+  createdAt     DateTime  @default(now())
+  /// @HideField({input:true, output: false})
+  updatedAt     DateTime  @updatedAt
+  /// @HideField({input:true, output: false})
+  createdBy     String?
+  /// @HideField({input:true, output: false})
+  updatedBy     String?
+  /// @HideField({input:true, output: false})
+  activatedAt   DateTime?
+  /// @HideField({input:true, output: false})
+  deactivatedAt DateTime?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  createdBy String?
-  updatedBy String?
+  /// @HideField({input:true, output: false})
+  Roles2Users       Roles2Users[]
+  /// @HideField({input:true, output: false})
+  Permissions2Users Permissions2Users[]
+  /// @HideField({input:true, output: false})
+  Profile           Profile?
 
   @@map("user")
 }
 
 model Role {
-  id   Int    @id @default(autoincrement())
-  name String @unique
+  id       Int     @id @default(autoincrement())
+  name     String  @unique
+  isActive Boolean @default(true)
 
-  role2user       Roles2Users[]
-  role2permission Permissions2Roles[]
-
+  /// @HideField({input:true, output: false})
   createdAt DateTime @default(now())
+  /// @HideField({input:true, output: false})
   updatedAt DateTime @updatedAt
+  /// @HideField({input:true, output: false})
   createdBy String?
+  /// @HideField({input:true, output: false})
   updatedBy String?
+
+  /// @HideField({input:true, output: false})
+  Roles2Users       Roles2Users[]
+  /// @HideField({input:true, output: false})
+  Permissions2Roles Permissions2Roles[]
 
   @@map("role")
 }
 
 model Permission {
-  id   Int    @id @default(autoincrement())
-  name String @unique
-
-  permission2user Permissions2Users[]
-  permission2role Permissions2Roles[]
+  id     Int    @id @default(autoincrement())
+  name   String @unique
+  module String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   createdBy String?
   updatedBy String?
+
+  Permissions2Users Permissions2Users[]
+  Permissions2Roles Permissions2Roles[]
 
   @@map("permission")
 }
 
 model Roles2Users {
-  id     Int  @id @default(autoincrement())
-  role   Role @relation(fields: [roleId], references: [id])
-  roleId Int
-  user   User @relation(fields: [userId], references: [id])
-  userId Int
+  id       Int     @id @default(autoincrement())
+  role     Role    @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  roleId   Int
+  user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId   Int
+  isActive Boolean @default(true)
 
+  /// @HideField({input:true, output: false})
   createdAt DateTime @default(now())
+  /// @HideField({input:true, output: false})
   updatedAt DateTime @updatedAt
+  /// @HideField({input:true, output: false})
   createdBy String?
+  /// @HideField({input:true, output: false})
   updatedBy String?
 
+  @@unique([userId, roleId])
   @@map("role_2_user")
 }
 
 model Permissions2Users {
   id           Int        @id @default(autoincrement())
-  permission   Permission @relation(fields: [permissionId], references: [id])
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
   permissionId Int
-  user         User       @relation(fields: [userId], references: [id])
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId       Int
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
-  createdBy    String?
-  updatedBy    String?
+  isActive     Boolean    @default(true)
 
+  /// @HideField({input:true, output: false})
+  createdAt DateTime @default(now())
+  /// @HideField({input:true, output: false})
+  updatedAt DateTime @updatedAt
+  /// @HideField({input:true, output: false})
+  createdBy String?
+  /// @HideField({input:true, output: false})
+  updatedBy String?
+
+  @@unique([userId, permissionId])
   @@map("permission_2_user")
 }
 
 model Permissions2Roles {
   id           Int        @id @default(autoincrement())
-  permission   Permission @relation(fields: [permissionId], references: [id])
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
   permissionId Int
-  role         Role       @relation(fields: [roleId], references: [id])
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
   roleId       Int
+  isActive     Boolean    @default(true)
+
+  /// @HideField({input:true, output: false})
+  createdAt DateTime @default(now())
+  /// @HideField({input:true, output: false})
+  updatedAt DateTime @updatedAt
+  /// @HideField({input:true, output: false})
+  createdBy String?
+  /// @HideField({input:true, output: false})
+  updatedBy String?
+
+  @@unique([roleId, permissionId])
+  @@map("permission_2_role")
+}
+
+model ApiKey {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  key         String   @unique
+  isActive    Boolean  @default(true)
+  expiresAt   DateTime
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  createdBy String?
-  updatedBy String?
 
-  @@map("permission_2_role")
+  @@map("api_key")
 }
 
 model Log {
@@ -139,15 +200,29 @@ model Log {
   @@map("log")
 }
 
-model ApiKey {
-  id        Int      @id @default(autoincrement())
-  name      String
-  key       String   @unique
-  isActive  Boolean  @default(true)
-  expiresAt DateTime
+model Profile {
+  id        Int     @id @default(autoincrement())
+  firstName String?
+  lastName  String?
+  phone     String?
+  address   String?
+  city      String?
+  state     String?
+  country   String?
+  zip       String?
+  /// @HideField({input:true, output: false})
+  user      User    @relation(fields: [userId], references: [id])
+  /// @HideField({input:true, output: false})
+  userId    Int     @unique
 
+  /// @HideField({input:true, output: false})
   createdAt DateTime @default(now())
+  /// @HideField({input:true, output: false})
   updatedAt DateTime @updatedAt
+  /// @HideField({input:true, output: false})
+  createdBy String?
+  /// @HideField({input:true, output: false})
+  updatedBy String?
 
-  @@map("api_key")
+  @@map("profile")
 }

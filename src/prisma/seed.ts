@@ -19,13 +19,15 @@ async function main() {
   }
 
   for (const permission of Object.values(PermissionEnum)) {
+    const module = permission.split('_')[0];
     await prisma.permission.upsert({
       where: {
         name: permission,
       },
       create: {
         name: permission,
-        permission2role: {
+        module: module,
+        Permissions2Roles: {
           create: {
             role: {
               connect: {

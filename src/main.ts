@@ -11,9 +11,9 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const config = app.get(ConfigService);
 
-  const environment = config.get<EnvironmentEnum>('NODE_ENV');
-  const port = config.get<number>('PORT');
-  const globalPrefix = config.get<string>('GLOBAL_PREFIX');
+  const environment = config.get<EnvironmentEnum>('environment');
+  const port = config.get<number>('port');
+  const globalPrefix = config.get<string>('globalPrefix');
 
   app.useLogger(LoggerUtil.getLogger(environment));
 
@@ -26,9 +26,7 @@ async function bootstrap() {
     .addBearerAuth()
     .build();
 
-  const swaggerDocument = SwaggerModule.createDocument(app, swaggerConfig, {
-    // extraModels: [...PrismaModel.extraModels],
-  });
+  const swaggerDocument = SwaggerModule.createDocument(app, swaggerConfig);
 
   SwaggerModule.setup(`${globalPrefix}/api-docs`, app, swaggerDocument);
 

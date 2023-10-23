@@ -1,6 +1,7 @@
 export interface LoginResponseInterface {
   accessToken: string;
   userId: number;
-  username: string;
+  email: string;
   permissions: string[];
+  roles: string[];
 }

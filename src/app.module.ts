@@ -6,6 +6,8 @@ import { ApolloDriver } from '@nestjs/apollo';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
+import { CommandModule } from 'nestjs-command';
+import { ApiKeysModule } from './api-keys/api-keys.module';
 import { AppController } from './app.controller';
 import { AppResolver } from './app.resolver';
 import { AppService } from './app.service';
@@ -13,13 +15,12 @@ import { AuthModule } from './auth/auth.module';
 import { configuration } from './config/configuration';
 import { validationSchema } from './config/validation';
 import { LoggerModule } from './logger/logger.module';
+import { PermissionsModule } from './permissions/permissions.module';
 import { PrismaModule } from './prisma/prisma.module';
+import { RbacModule } from './rbac/rbac.module';
+import { RolesModule } from './roles/roles.module';
 import { EnvironmentEnum } from './shared/enums/environment.enum';
 import { UsersModule } from './users/users.module';
-import { PermissionsModule } from './permissions/permissions.module';
-import { RolesModule } from './roles/roles.module';
-import { CommandModule } from 'nestjs-command';
-import { ApiKeysModule } from './api-keys/api-keys.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -47,9 +48,10 @@ import { ApiKeysModule } from './api-keys/api-keys.module';
     LoggerModule,
     PrismaModule,
     AuthModule,
+    RbacModule,
     UsersModule,
-    PermissionsModule,
     RolesModule,
+    PermissionsModule,
     ApiKeysModule,
   ],
   controllers: [AppController],

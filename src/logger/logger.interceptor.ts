@@ -20,6 +20,7 @@ export class LoggerInterceptor implements NestInterceptor {
     const userAgent = request.get('user-agent') || '';
     const { ip, method, url, body, query, params } = request;
 
+    const header = request.headers;
     const className = context.getClass().name;
     const handlerName = context.getHandler().name;
 

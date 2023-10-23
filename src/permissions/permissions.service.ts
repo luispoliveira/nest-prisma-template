@@ -17,4 +17,8 @@ export class PermissionsService {
   async findUnique(args: Prisma.PermissionFindUniqueArgs) {
     return await this.prismaService.permission.findUnique(args);
   }
+
+  async findFirst(args: Prisma.PermissionFindFirstArgs) {
+    return await this.prismaService.permission.findFirst(args);
+  }
 }

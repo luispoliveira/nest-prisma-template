@@ -1,61 +1,66 @@
-import { UnauthorizedException } from '@nestjs/common';
 import { Args, Mutation, Resolver } from '@nestjs/graphql';
 
-import {
-  User,
-  UserCreateInput,
-} from '../shared/__generated__/prisma-nestjs-graphql';
-import { BasePublicResolver } from '../shared/resolvers/base-public.resolver';
+import { User } from '../shared/__generated__/prisma-nestjs-graphql';
+import { GetUser } from '../shared/decorators/get-user.decorator';
+import { Public } from '../shared/decorators/is-public.decorator';
+import { BaseAuthResolver } from '../shared/resolvers/base-auth.resolver';
+import { UserValidate } from '../shared/types/user-validate.type';
+import { UsersService } from '../users/users.service';
 import { AuthService } from './auth.service';
-import { LoginInput } from './input-types/login.input';
-import { RecoverInput } from './input-types/recover.input';
-import { ResetInput } from './input-types/reset.input';
 import { Login } from './object-types/login.model';
-import { RecoverModel } from './object-types/recover.model';
-import { ResetModel } from './object-types/reset.model';
 
 @Resolver()
-export class AuthResolver extends BasePublicResolver {
-  constructor(private readonly authService: AuthService) {
+export class AuthResolver extends BaseAuthResolver {
+  constructor(
+    private readonly authService: AuthService,
+    private readonly usersService: UsersService,
+  ) {
     super();
   }
 
   @Mutation(() => Login, { name: 'AuthLogin' })
-  async login(@Args('loginInput') loginInput: LoginInput) {
-    const user = await this.authService.validateUser(
-      loginInput.username,
-      loginInput.password,
-    );
-
-    if (!user || !user.isActive)
-      throw new UnauthorizedException('User not found or inactive');
+  @Public()
+  async login(
+    @Args({ name: 'email', type: () => String }) email: string,
+    @Args({ name: 'password', type: () => String }) password: string,
+  ) {
+    const user = await this.authService.validateUser(email, password);
 
     return await this.authService.login(user as User);
   }
 
-  @Mutation(() => User, { name: 'AuthSignUp' })
-  signUp(@Args('signUpInput') userCreateInput: UserCreateInput) {
-    return this.authService.signUp({
-      username: userCreateInput.username,
-      email: userCreateInput.email,
-      password: userCreateInput.password,
+  @Mutation(() => User, { name: 'AuthWhoAmI' })
+  async whoAmI(@GetUser() user: UserValidate) {
+    return await this.usersService.findUnique({
+      where: {
+        id: user.id,
+      },
     });
   }
 
-  @Mutation(() => RecoverModel, { name: 'AuthRecoverPassword' })
-  async recoverPassword(@Args('recoverInput') recoverInput: RecoverInput) {
-    await this.authService.recoverPassword(recoverInput.email);
-    return { message: 'A reset email has been sent to your email.' };
+  @Mutation(() => Boolean, { name: 'AuthForgetPassword' })
+  @Public()
+  async forgetPassword(
+    @Args({ name: 'email', type: () => String }) email: string,
+  ) {
+    return await this.authService.forgetPassword(email);
   }
 
-  @Mutation(() => ResetModel, { name: 'AuthResetPassword' })
-  async resetPassword(@Args('resetInput') resetInput: ResetInput) {
-    await this.authService.resetPassword(
-      resetInput.resetToken,
-      resetInput.password,
-    );
-    return {
-      message: 'Your password has been updated.',
-    };
+  @Mutation(() => Boolean, { name: 'AuthRecoverPassword' })
+  @Public()
+  async recoverPassword(
+    @Args({ name: 'token', type: () => String }) token: string,
+    @Args({ name: 'password', type: () => String }) password: string,
+  ) {
+    return await this.authService.recoverPassword(token, password);
+  }
+
+  @Mutation(() => Boolean, { name: 'AuthActivateAccount' })
+  @Public()
+  async activateAccount(
+    @Args({ name: 'token', type: () => String }) token: string,
+    @Args({ name: 'password', type: () => String }) password: string,
+  ) {
+    return await this.authService.activateAccount(token, password);
   }
 }

@@ -11,7 +11,6 @@ export const validationSchema = Joi.object({
     .required(),
   PORT: Joi.number().default(3000),
   GLOBAL_PREFIX: Joi.string().default(''),
-  ADMIN_USERNAME: Joi.string().required(),
   ADMIN_EMAIL: Joi.string().email().required(),
   ADMIN_PASSWORD: Joi.string().required(),
   JWT_IGNORE_EXPIRATION: Joi.boolean().default(false),
