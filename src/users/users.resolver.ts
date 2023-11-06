@@ -80,9 +80,9 @@ export class UsersResolver extends BaseAuthResolver {
   async update(@Args() args: UpdateOneUserArgs, @GetUser() user: UserValidate) {
     const where = args.where;
     if (
-      !this.rbacService.userHasPermissions(user.id, [
+      !(await this.rbacService.userHasPermissions(user.id, [
         PermissionEnum.USER_UPDATE_OTHER,
-      ])
+      ]))
     ) {
       where.id = user.id;
     }
