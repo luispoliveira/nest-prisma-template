@@ -1,6 +1,6 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { UsersService } from '../../users/users.service';
+import { RbacService } from '../../rbac/rbac.service';
 import { PERMISSIONS_KEY } from '../decorators/permission.decorator';
 import { PermissionEnum } from '../enums/permission.enum';
 import { ContextUtil } from '../utils/context.util';
@@ -9,7 +9,7 @@ import { ContextUtil } from '../utils/context.util';
 export class PermissionsGuard implements CanActivate {
   constructor(
     private reflector: Reflector,
-    private readonly usersService: UsersService,
+    private readonly rbacService: RbacService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -22,12 +22,9 @@ export class PermissionsGuard implements CanActivate {
     const requestUser = ContextUtil.getRequest(context).user;
     if (!requestUser) return false;
 
-    const permissions = await this.usersService.getUserPermissions(
+    return await this.rbacService.userHasPermissions(
       requestUser.id,
-    );
-
-    return requiredPermissions.some((permission) =>
-      permissions.includes(permission.toString()),
+      requiredPermissions,
     );
   }
 }

@@ -65,6 +65,12 @@ export class UsersService implements OnModuleInit {
         isActive: true,
         createdBy: 'system',
         updatedBy: 'system',
+        Profile: {
+          create: {
+            createdBy: 'system',
+            updatedBy: 'system',
+          },
+        },
         Roles2Users: {
           create: {
             createdBy: 'system',
@@ -82,33 +88,51 @@ export class UsersService implements OnModuleInit {
     this.logger.log(`Admin user created`);
   }
 
-  async findMany(args: Prisma.UserFindManyArgs) {
+  async findMany(args: Prisma.UserFindManyArgs, include = this.defaultInclude) {
     return await this.prismaService.user.findMany({
       ...args,
-      include: this.defaultInclude,
+      include,
     });
   }
 
-  async findUnique(args: Prisma.UserFindUniqueArgs) {
-    return await this.prismaService.user.findUnique(args);
+  async findUnique(
+    args: Prisma.UserFindUniqueArgs,
+    include = this.defaultInclude,
+  ) {
+    return await this.prismaService.user.findUnique({
+      ...args,
+      include,
+    });
   }
 
-  async findFirst(args: Prisma.UserFindFirstArgs) {
-    return await this.prismaService.user.findFirst(args);
+  async findFirst(
+    args: Prisma.UserFindFirstArgs,
+    include = this.defaultInclude,
+  ) {
+    return await this.prismaService.user.findFirst({
+      ...args,
+      include,
+    });
   }
 
-  async create(args: Prisma.UserCreateArgs) {
+  async create(args: Prisma.UserCreateArgs, include = this.defaultInclude) {
     try {
-      return await this.prismaService.user.create(args);
+      return await this.prismaService.user.create({
+        ...args,
+        include: include,
+      });
     } catch (e) {
       this.logger.error(e);
       throw e;
     }
   }
 
-  async update(args: Prisma.UserUpdateArgs) {
+  async update(args: Prisma.UserUpdateArgs, include = this.defaultInclude) {
     try {
-      return await this.prismaService.user.update(args);
+      return await this.prismaService.user.update({
+        ...args,
+        include,
+      });
     } catch (e) {
       this.logger.error(e);
       throw e;
@@ -161,6 +185,9 @@ export class UsersService implements OnModuleInit {
       },
       include: {
         Permissions2Roles: {
+          where: {
+            isActive: true,
+          },
           include: {
             permission: true,
           },
